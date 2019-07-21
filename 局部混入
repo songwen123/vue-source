@@ -1,0 +1,16 @@
+在 components 目录下创建一个mixins文件夹，并在 mixins 目录下创建一个 mixin.js 文件
+在 mixin.js 文件里写入如下代码
+const mixin = {
+  data() {
+    return {
+      msg: '哈哈'
+    }
+  },
+  methods: {
+    mixinMethod() {
+      console.log(this.msg+'，这是mixin混入的方法')
+    }
+  }
+}
+
+export default mixin;
