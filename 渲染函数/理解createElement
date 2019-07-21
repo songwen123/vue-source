@@ -1,0 +1,173 @@
+Vue通过建立一个虚拟DOM对真实的DOM发生变化保存追踪，如下代码：
+return createElement('h1', this.title);
+createElement返回的是包含的信息会告诉VUE页面上需要渲染什么样的节点及其子节点。我们称这样的节点为虚拟DOM，可以简写为VNode
+
+createElement 参数
+
+// @return {VNode}
+createElement(
+  // {String | Object | Function}
+  // 一个HTML标签字符串，组件选项对象，或者一个返回值类型为String/Object的函数。该参数是必须的
+  'div',
+
+  // {Object}
+  // 一个包含模板相关属性的数据对象，这样我们可以在template中使用这些属性，该参数是可选的。
+  {
+
+  },
+
+  // {String | Array}
+  // 子节点（VNodes）由 createElement() 构建而成。可选参数
+  // 或简单的使用字符串来生成的 "文本节点"。
+  [
+    'xxxx',
+    createElement('h1', '一则头条'),
+    createElement(MyComponent, {
+      props: {
+        someProp: 'xxx'
+      }
+    })
+  ]
+)
+
+理解深入data对象。
+在模板语法中，我们可以使用 v-bind:class 和 v-bind:style 来绑定属性，在VNode数据对象中，下面的属性名的字段级别是最高的。
+该对象允许我们绑定普通的html特性，就像DOM属性一样。如下：
+{
+  // 和`v-bind:class`一样的 API
+  'class': {
+    foo: true,
+    bar: false
+  },
+  // 和`v-bind:style`一样的 API
+  style: {
+    color: 'red',
+    fontSize: '14px'
+  },
+  // 正常的 HTML 特性
+  attrs: {
+    id: 'foo'
+  },
+  // 组件 props
+  props: {
+    myProp: 'bar'
+  },
+  // DOM 属性
+  domProps: {
+    innerHTML: 'baz'
+  },
+  // 事件监听器基于 `on`
+  // 所以不再支持如 `v-on:keyup.enter` 修饰器
+  // 需要手动匹配 keyCode。
+  on: {
+    click: this.clickHandler
+  },
+  // 仅对于组件，用于监听原生事件，而不是组件内部使用 `vm.$emit` 触发的事件。
+  nativeOn: {
+    click: this.nativeClickHandler
+  },
+  // 自定义指令。注意事项：不能对绑定的旧值设值
+  // Vue 会为您持续追踪
+  directives: [
+    {
+      name: 'my-custom-directive',
+      value: '2',
+      expression: '1 + 1',
+      arg: 'foo',
+      modifiers: {
+        bar: true
+      }
+    }
+  ],
+  // Scoped slots in the form of
+  // { name: props => VNode | Array<VNode> }
+  scopedSlots: {
+    default: props => createElement('span', props.text)
+  },
+  // 如果组件是其他组件的子组件，需为插槽指定名称
+  slot: 'name-of-slot',
+  // 其他特殊顶层属性
+  key: 'myKey',
+  ref: 'myRef'
+}
+
+上面的data数据可能不太好理解，我们来看一个demo，就知道它是如何使用的了，如下代码：
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>演示Vue</title>
+    <style>
+      
+    </style>
+  </head>
+  <body>
+    <div id="container">
+      <tb-heading :level="2">
+        Hello world!
+      </tb-heading>
+    </div>
+  </body>
+  <script src="./vue.js"></script>
+
+  <script>
+    var getChildrenTextContent = function(children) {
+      return children.map(function(node) {
+        return node.children ? getChildrenTextContent(node.children) : node.text
+      }).join('')
+    };
+    Vue.component('tb-heading', {
+      render: function(createElement) {
+        var headingId = getChildrenTextContent(this.$slots.default)
+          .toLowerCase()
+          .replace(/\W+/g, '-')
+          .replace(/(^\-|\-$)/g, '')
+        return createElement(
+          'h' + this.level,
+          [
+            createElement('a', {
+              attrs: {
+                name: headingId,
+                href: '#' + headingId
+              },
+              style: {
+                color: 'red',
+                fontSize: '20px'
+              },
+              'class': {
+                foo: true,
+                bar: false
+              },
+              // DOM属性
+              domProps: {
+                innerHTML: 'baz'
+              },
+              // 组件props
+              props: {
+                myProp: 'bar'
+              },
+              // 事件监听基于 'on'
+              // 所以不再支持如 'v-on:keyup.enter' 修饰语
+              // 需要手动匹配 KeyCode  
+              on: {
+                click: function(event) {
+                  event.preventDefault();
+                  console.log(111);
+                }
+              }
+            }, this.$slots.default)
+          ]
+        )
+      },
+      props: {
+        level: {
+          type: Number,
+          required: true
+        }
+      }
+    });
+    new Vue({
+      el: '#container'
+    });
+  </script>
+</html>
