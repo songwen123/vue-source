@@ -14,3 +14,20 @@ const mixin = {
 }
 
 export default mixin;
+在需要的页面引入并使用
+
+<template>
+	<div>{{msg}}</div>
+</template>
+<script>
+import mixin from '../mixins/mixin'
+export default {
+	mixins: [mixin],
+    data() {
+	    return {
+	    }
+    }
+	mounted() {
+		this.mixinMethod()
+	}
+}
