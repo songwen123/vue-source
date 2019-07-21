@@ -22,12 +22,11 @@ export default mixin;
 <script>
 import mixin from '../mixins/mixin'
 export default {
-	mixins: [mixin],
+    mixins: [mixin],
     data() {
-	    return {
-	    }
+         return {}
     }
-	mounted() {
-		this.mixinMethod()
-	}
+    mounted() {
+	this.mixinMethod()
+    }
 }
