@@ -1,0 +1,80 @@
+1. 在 HTML 中全局混入
+一旦使用全局混入对象，将会影响到所有之后创建的 Vue 实例
+
+<body>
+    <div id="app"></div>
+</body>
+</html>
+<script src="./vue.js"></script>
+<script>
+    Vue.mixin({
+        methods: {
+            mixinOne: function() {
+                console.log('mixinOne')
+            }    
+        }
+    })
+    new Vue({
+        el: '#app',
+        methods: {
+            mixinTwo: function () {
+                console.log('mixinTwo')
+            }
+        },
+        mounted() {
+            this.mixinOne()
+            this.mixinTwo()
+        }
+    })
+    
+	// mixinOne
+	// mixinTwo
+</script>
+
+2. 在 Vue 项目中全局混入
+在 main.js 中写入如下代码
+import Vue from 'vue'
+import App from './App'
+import router from './router'
+
+Vue.config.productionTip = false
+
+Vue.mixin({
+  data() {
+    return {
+      msg: '哈哈'
+    }
+  },
+  methods: {
+    mixinMethod() {
+      console.log(this.msg+'，这是mixin混入的方法')
+    }
+  }
+})
+
+/* eslint-disable no-new */
+new Vue({
+    el: '#app',
+    router,
+    components: { App },
+    template: '<App/>'
+})
+ 
+ 在组件中直接使用
+
+<template>
+	<div>{{msg}}</div>
+</template>
+<script>
+export default {
+    data() {
+	    return {
+	    }
+    }
+	mounted() {
+		this.mixinMethod()
+	}
+}
+
+// 哈哈，这是mixin混入的方法
+</script>
