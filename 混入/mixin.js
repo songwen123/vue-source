@@ -46,3 +46,20 @@ export const mixTwo = {
     }
 
 };
+export const  Mixins = {
+    data: {
+        msg: 'I am Mixins',
+        msg1: 'I am Mixins msg1'
+    },
+    created() {
+        console.log('我是组件中的变量：' + this.msg2)
+    },
+    methods: {
+        mixin: function() {
+            console.log('Mixin')
+        },
+        mixinTwo: function () {
+            console.log('MixinTwo')
+        }
+    }
+};
